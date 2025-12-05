@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi Tiết Trận Đấu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 min-h-screen flex flex-col items-center py-6 font-sans text-gray-200">
+
+    <!-- Nút quay lại -->
+    <div class="w-full max-w-6xl mb-4 px-4">
+        <a href="/" class="inline-flex items-center text-gray-400 hover:text-white transition group">
+            <div class="bg-gray-800 p-2 rounded-full mr-2 group-hover:bg-gray-700 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </div>
+            Quay lại trang chủ
+        </a>
+    </div>
+
+    <!-- KHUNG TỈ SỐ CHÍNH -->
+    <div class="w-full max-w-6xl bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700 mb-6">
+        <div class="p-6 md:p-10 flex flex-col md:flex-row items-center justify-between bg-gradient-to-b from-gray-800 to-gray-900 relative">
+            
+            <!-- Đội nhà -->
+            <div class="flex flex-col items-center w-full md:w-1/3 mb-6 md:mb-0">
+                <img th:src="${match.homeLogo}" class="w-24 h-24 mb-3 object-contain drop-shadow-lg">
+                <h2 class="text-3xl font-bold text-white tracking-tight" th:text="${match.homeTeam}">Home</h2>
+                
+                <!-- Phong độ Đội nhà -->
+                <div class="mt-3 flex space-x-1">
+                    <span th:each="res : ${homeForm}" 
+                          class="w-6 h-6 flex items-center justify-center text-[10px] font-bold rounded text-white"
+                          th:classappend="${res.result == 'W' ? 'bg-green-600' : (res.result == 'D' ? 'bg-gray-500' : 'bg-red-600')}"
+                          th:text="${res.result}" th:title="${res.score + ' vs ' + res.opponent}">
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Tỉ số Trung tâm -->
+            <div class="flex flex-col items-center w-full md:w-1/3 relative z-10">
+                <div class="text-6xl font-black text-white tracking-widest mb-2 drop-shadow-lg font-mono">
+                    <span th:text="${match.homeScore}" class="text-blue-400">0</span>
+                    <span class="text-gray-600 mx-2">-</span>
+                    <span th:text="${match.awayScore}" class="text-blue-400">0</span>
+                </div>
+                <div class="px-4 py-1.5 bg-red-600/20 border border-red-500/50 text-red-400 rounded-full text-sm font-bold animate-pulse flex items-center" th:if="${match.isLive}">
+                    <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                    LIVE <span th:text="${match.time}" class="ml-1"></span>
+                </div>
+                <div class="px-4 py-1.5 bg-gray-700 text-gray-400 rounded-full text-sm font-bold" th:unless="${match.isLive}">
+                    FULL TIME
+                </div>
+            </div>
+
+            <!-- Đội khách -->
+            <div class="flex flex-col items-center w-full md:w-1/3 mt-6 md:mt-0">
+                <img th:src="${match.awayLogo}" class="w-24 h-24 mb-3 object-contain drop-shadow-lg">
+                <h2 class="text-3xl font-bold text-white tracking-tight" th:text="${match.awayTeam}">Away</h2>
+                
+                <!-- Phong độ Đội khách -->
+                <div class="mt-3 flex space-x-1">
+                    <span th:each="res : ${awayForm}" 
+                          class="w-6 h-6 flex items-center justify-center text-[10px] font-bold rounded text-white"
+                          th:classappend="${res.result == 'W' ? 'bg-green-600' : (res.result == 'D' ? 'bg-gray-500' : 'bg-red-600')}"
+                          th:text="${res.result}" th:title="${res.score + ' vs ' + res.opponent}">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KHUNG CHI TIẾT 2 BÊN -->
+    <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-6 px-4 md:px-0">
+        
+        <!-- === CỘT TRÁI: ĐỘI NHÀ === -->
+        <div class="space-y-6">
+            
+            <!-- Huấn luyện viên -->
+            <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 flex items-center justify-between">
+                <span class="text-gray-400 text-sm font-semibold uppercase">Huấn luyện viên</span>
+                <span class="text-white font-bold text-lg" th:text="${homeLineup.manager}">HLV Name</span>
+            </div>
+
+            <!-- Đội hình Chính thức -->
+            <div class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg">
+                <div class="bg-gray-700/50 p-4 border-b border-gray-600 flex justify-between items-center">
+                    <h3 class="font-bold text-white flex items-center">
+                        <span class="w-1.5 h-5 bg-blue-500 mr-2 rounded-sm"></span> Đội hình Chính
+                    </h3>
+                    <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded border border-gray-600" th:text="${homeLineup.formation}">4-3-3</span>
+                </div>
+                <div class="p-4">
+                    <ul class="space-y-2">
+                        <li th:each="player, i : ${homeLineup.startingXI}" class="flex items-center text-gray-200 text-sm hover:bg-gray-700/50 p-2 rounded transition">
+                            <span class="w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 border border-blue-500/30 flex items-center justify-center text-xs mr-3 font-mono" th:text="${i.index + 1}">1</span>
+                            <span th:text="${player}" class="font-medium">Cầu thủ</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Cầu thủ Dự bị -->
+            <div class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg opacity-90">
+                <div class="bg-gray-700/30 p-3 border-b border-gray-600">
+                    <h3 class="font-bold text-gray-300 text-sm flex items-center">
+                        <span class="w-1.5 h-4 bg-gray-500 mr-2 rounded-sm"></span> Cầu thủ Dự bị
+                    </h3>
+                </div>
+                <div class="p-4 grid grid-cols-2 gap-2">
+                    <div th:each="sub : ${homeLineup.substitutes}" class="flex items-center text-gray-400 text-xs">
+                        <span class="w-1.5 h-1.5 bg-gray-600 rounded-full mr-2"></span>
+                        <span th:text="${sub}">Tên dự bị</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lịch 3 trận tới -->
+            <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Lịch thi đấu tiếp theo</h3>
+                <div class="space-y-2">
+                    <div th:each="fix : ${homeFixtures}" class="flex items-center justify-between p-3 bg-gray-700/40 border border-gray-600/30 rounded-lg">
+                        <div class="flex items-center">
+                            <img th:src="${fix.logo}" class="w-6 h-6 mr-3 opacity-80">
+                            <div>
+                                <div class="text-sm font-bold text-gray-200" th:text="${fix.opponent}">Đối thủ</div>
+                                <div class="text-[10px] text-gray-500" th:text="${fix.type == '(H)' ? 'Sân nhà' : 'Sân khách'}">Home</div>
+                            </div>
+                        </div>
+                        <div class="text-xs font-bold text-blue-300 bg-blue-900/30 px-2 py-1 rounded border border-blue-500/20" th:text="${fix.date}">Date</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === CỘT PHẢI: ĐỘI KHÁCH === -->
+        <div class="space-y-6">
+            
+            <!-- Huấn luyện viên -->
+            <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 flex items-center justify-between">
+                <span class="text-gray-400 text-sm font-semibold uppercase">Huấn luyện viên</span>
+                <span class="text-white font-bold text-lg" th:text="${awayLineup.manager}">HLV Name</span>
+            </div>
+
+            <!-- Đội hình Chính thức -->
+            <div class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg">
+                <div class="bg-gray-700/50 p-4 border-b border-gray-600 flex justify-between items-center">
+                    <h3 class="font-bold text-white flex items-center">
+                        <span class="w-1.5 h-5 bg-red-500 mr-2 rounded-sm"></span> Đội hình Chính
+                    </h3>
+                    <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded border border-gray-600" th:text="${awayLineup.formation}">4-3-3</span>
+                </div>
+                <div class="p-4">
+                    <ul class="space-y-2">
+                        <li th:each="player, i : ${awayLineup.startingXI}" class="flex items-center text-gray-200 text-sm hover:bg-gray-700/50 p-2 rounded transition">
+                            <span class="w-6 h-6 rounded-full bg-red-900/50 text-red-400 border border-red-500/30 flex items-center justify-center text-xs mr-3 font-mono" th:text="${i.index + 1}">1</span>
+                            <span th:text="${player}" class="font-medium">Cầu thủ</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Cầu thủ Dự bị -->
+            <div class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg opacity-90">
+                <div class="bg-gray-700/30 p-3 border-b border-gray-600">
+                    <h3 class="font-bold text-gray-300 text-sm flex items-center">
+                        <span class="w-1.5 h-4 bg-gray-500 mr-2 rounded-sm"></span> Cầu thủ Dự bị
+                    </h3>
+                </div>
+                <div class="p-4 grid grid-cols-2 gap-2">
+                    <div th:each="sub : ${awayLineup.substitutes}" class="flex items-center text-gray-400 text-xs">
+                        <span class="w-1.5 h-1.5 bg-gray-600 rounded-full mr-2"></span>
+                        <span th:text="${sub}">Tên dự bị</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lịch 3 trận tới -->
+            <div class="bg-gray-800 rounded-xl p-5 border border-gray-700 shadow-lg">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Lịch thi đấu tiếp theo</h3>
+                <div class="space-y-2">
+                    <div th:each="fix : ${awayFixtures}" class="flex items-center justify-between p-3 bg-gray-700/40 border border-gray-600/30 rounded-lg">
+                        <div class="flex items-center">
+                            <img th:src="${fix.logo}" class="w-6 h-6 mr-3 opacity-80">
+                            <div>
+                                <div class="text-sm font-bold text-gray-200" th:text="${fix.opponent}">Đối thủ</div>
+                                <div class="text-[10px] text-gray-500" th:text="${fix.type == '(H)' ? 'Sân nhà' : 'Sân khách'}">Home</div>
+                            </div>
+                        </div>
+                        <div class="text-xs font-bold text-blue-300 bg-blue-900/30 px-2 py-1 rounded border border-blue-500/20" th:text="${fix.date}">Date</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
