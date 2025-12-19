@@ -9,36 +9,38 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # --- PHẦN 1: CHUẨN BỊ ---
+      # --- BƯỚC 1: LẤY CODE VỀ ---
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # --- BƯỚC 2: CÀI ĐẶT JAVA ---
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # --- PHẦN 2: BUILD CODE & TEST ---
+      # --- BƯỚC 3: BUILD FILE .JAR ---
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      # --- PHẦN 3: ĐÓNG GÓI DOCKER ---
+      # --- BƯỚC 4: ĐĂNG NHẬP DOCKER HUB ---
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # --- BƯỚC 5: ĐÓNG GÓI VÀ ĐẨY IMAGE LÊN DOCKER HUB ---
       - name: Build and push Docker Image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          # Thay tên tài khoản của bạn vào đây nếu chưa đúng
+          # Thay live-score-app bằng tên image bạn thích nếu muốn
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/live-score-app:latest
 
-      # --- PHẦN 4: GỌI RENDER (MỚI THÊM) ---
+      # --- BƯỚC 6: GỌI RENDER ĐỂ DEPLOY (TỰ ĐỘNG) ---
       # Bước này chỉ chạy khi các bước trên thành công
       - name: Trigger Render Deployment
         if: success()
